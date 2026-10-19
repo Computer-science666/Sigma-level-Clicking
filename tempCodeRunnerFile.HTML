@@ -37,7 +37,7 @@
     --bg: #12372a; --panel: #1b4a39; --ink: #eef7e8; --muted: #a5c7b2;
     --accent: #f2d16b; --accent-ink: #2b2204; --ring: #3d6b50; --line: #2c6049;
   }
- 
+
   html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
   body {
     margin: 0; min-height: 100%; background: var(--bg); color: var(--ink);
@@ -47,17 +47,17 @@
   h1, h2, .big { font-family: "Lilita One", "Arial Rounded MT Bold", system-ui, sans-serif; font-weight: 400; margin: 0; }
   button { font: inherit; color: inherit; cursor: pointer; }
   :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
- 
+
   .wrap { max-width: 920px; margin: 0 auto; padding: 20px 16px 40px; }
   header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
   h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); }
   .tagline { color: var(--muted); margin: 0; }
- 
+
   .layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
   @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
   .card { background: var(--panel); border: 2px solid var(--line); border-radius: 22px; padding: 18px; }
   .card h2 { font-size: 1.3rem; margin-bottom: 10px; }
- 
+
   /* ---------- GAME ---------- */
   .stats { display: flex; justify-content: space-around; text-align: center; margin-bottom: 14px; }
   .stats .big { font-size: 2.2rem; display: block; line-height: 1.1; }
@@ -79,7 +79,7 @@
   .chip { padding: 8px 16px; border-radius: 99px; border: 2px solid var(--line); background: transparent; font-weight: 800; }
   .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   .chip:disabled { opacity: .5; cursor: not-allowed; }
- 
+
   /* ---------- SIDE PANELS ---------- */
   .side { display: grid; gap: 16px; align-content: start; }
   .avatars { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -102,9 +102,8 @@
       <p class="tagline">Click as many times as you can before the timer runs out.</p>
     </div>
   </header>
- 
+
   <div class="layout">
-    <!-- GAME CARD -->
     <section class="card" aria-label="Game">
       <div class="stats">
         <div><span class="big" id="time">10.0</span><small>seconds left</small></div>
@@ -120,8 +119,7 @@
         <button class="chip" data-sec="30" aria-pressed="false">30 seconds</button>
       </div>
     </section>
- 
-    <!-- SIDE: PROFILE + LOOK -->
+
     <div class="side">
       <section class="card" aria-label="Profile">
         <h2>Your profile</h2>
@@ -137,7 +135,7 @@
         <p class="total">Total clicks ever: <strong id="total">0</strong></p>
         <button class="link" id="reset">Reset my scores</button>
       </section>
- 
+
       <section class="card" aria-label="Look">
         <h2>Pick a look</h2>
         <div class="row" id="skins" role="group" aria-label="Theme">
@@ -149,9 +147,8 @@
     </div>
   </div>
 </div>
- 
+
 <script>
-  // ---------- 1. FIND THE ELEMENTS (getElementById = the "wire" to each id) ----------
   const clickBtn = document.getElementById("click-btn");
   const timeEl = document.getElementById("time");
   const countEl = document.getElementById("count");
@@ -160,18 +157,16 @@
   const message = document.getElementById("message");
   const nameInput = document.getElementById("name");
   const totalEl = document.getElementById("total");
- 
-  // ---------- 2. STATE (variables that remember things between clicks) ----------
-  let seconds = 10;       // chosen time limit
-  let count = 0;          // clicks this round
-  let running = false;    // is a round happening?
-  let startTime = 0;      // when the round began
-  let timerId = null;     // the setInterval handle
- 
+
+  let seconds = 10;
+  let count = 0;
+  let running = false;
+  let startTime = 0;
+  let timerId = null;
+
   const AVATARS = ["😎", "🦊", "🚀", "🐉"];
   let profile = { name: "", avatar: "😎", skin: "", total: 0, best: { 5: 0, 10: 0, 30: 0 } };
- 
-  // ---------- 3. SAVE / LOAD (localStorage keeps data in this browser) ----------
+
   function save() {
     try { localStorage.setItem("sigmaClick", JSON.stringify(profile)); } catch (e) {}
   }
@@ -181,8 +176,7 @@
       if (raw) profile = Object.assign(profile, JSON.parse(raw));
     } catch (e) {}
   }
- 
-  // ---------- 4. DRAW THE PROFILE ON SCREEN ----------
+
   function renderProfile() {
     nameInput.value = profile.name;
     totalEl.textContent = profile.total;
@@ -198,8 +192,7 @@
     });
     if (profile.skin) document.documentElement.setAttribute("data-skin", profile.skin);
   }
- 
-  // ---------- 5. THE GAME ----------
+
   function resetDisplay() {
     count = 0;
     countEl.textContent = "0";
@@ -208,15 +201,15 @@
     barFill.style.transform = "scaleX(1)";
     clickBtn.textContent = "Click to start";
   }
- 
+
   function startRound() {
     running = true;
     startTime = Date.now();
     document.querySelectorAll("#modes .chip").forEach(function (b) { b.disabled = true; });
     message.textContent = "Go go go!";
-    timerId = setInterval(tick, 100);   // run tick() every 0.1 seconds
+    timerId = setInterval(tick, 100);
   }
- 
+
   function tick() {
     const elapsed = (Date.now() - startTime) / 1000;
     const left = Math.max(0, seconds - elapsed);
@@ -225,14 +218,14 @@
     cpsEl.textContent = (count / Math.max(elapsed, 0.1)).toFixed(1);
     if (left <= 0) endRound();
   }
- 
+
   function rankFor(cps) {
     if (cps < 3) return "Warming up";
     if (cps < 5) return "Fast fingers";
     if (cps < 7) return "Sigma";
     return "Legend";
   }
- 
+
   function endRound() {
     clearInterval(timerId);
     running = false;
@@ -248,15 +241,13 @@
     renderProfile();
     message.textContent = text;
     clickBtn.textContent = "Wait...";
-    // unlock the button again after a short pause so a stray click does not start a new round
     setTimeout(function () {
       clickBtn.disabled = false;
       clickBtn.textContent = "Play again";
       document.querySelectorAll("#modes .chip").forEach(function (b) { b.disabled = false; });
     }, 800);
   }
- 
-  // The big button: the first click starts the round, every click adds 1
+
   clickBtn.addEventListener("click", function () {
     if (!running) {
       resetDisplay();
@@ -266,8 +257,7 @@
     countEl.textContent = count;
     clickBtn.textContent = "Click!";
   });
- 
-  // ---------- 6. TIME MODE BUTTONS ----------
+
   document.getElementById("modes").addEventListener("click", function (e) {
     const btn = e.target.closest(".chip");
     if (!btn || running) return;
@@ -278,8 +268,7 @@
     resetDisplay();
     message.textContent = "Mode: " + seconds + " seconds. Click the big button to start.";
   });
- 
-  // ---------- 7. PROFILE CONTROLS ----------
+
   AVATARS.forEach(function (emoji) {
     const b = document.createElement("button");
     b.type = "button";
@@ -288,12 +277,12 @@
     b.addEventListener("click", function () { profile.avatar = emoji; save(); renderProfile(); });
     document.getElementById("avatars").appendChild(b);
   });
- 
+
   nameInput.addEventListener("input", function () {
     profile.name = nameInput.value;
     save();
   });
- 
+
   document.getElementById("skins").addEventListener("click", function (e) {
     const btn = e.target.closest(".chip");
     if (!btn) return;
@@ -301,7 +290,7 @@
     save();
     renderProfile();
   });
- 
+
   document.getElementById("reset").addEventListener("click", function () {
     profile.total = 0;
     profile.best = { 5: 0, 10: 0, 30: 0 };
@@ -309,8 +298,7 @@
     renderProfile();
     message.textContent = "Scores reset. Fresh start!";
   });
- 
-  // ---------- 8. START UP ----------
+
   load();
   renderProfile();
   resetDisplay();
