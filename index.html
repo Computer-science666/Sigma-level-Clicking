@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sigma Click Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #dff1ff; --panel: #ffffff; --ink: #14324a; --muted: #55728a;
+    --accent: #ff7a1a; --accent-ink: #ffffff; --ring: #ffd2ad; --line: #b9d9ee;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1a1440; --panel: #272058; --ink: #f1eeff; --muted: #a9a2d6;
+      --accent: #ff4fa3; --accent-ink: #20082f; --ring: #5a2d6f; --line: #3b3380;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1a1440; --panel: #272058; --ink: #f1eeff; --muted: #a9a2d6;
+    --accent: #ff4fa3; --accent-ink: #20082f; --ring: #5a2d6f; --line: #3b3380;
+  }
+  :root[data-skin="sunny"] {
+    --bg: #dff1ff; --panel: #ffffff; --ink: #14324a; --muted: #55728a;
+    --accent: #ff7a1a; --accent-ink: #ffffff; --ring: #ffd2ad; --line: #b9d9ee;
+  }
+  :root[data-skin="night"] {
+    --bg: #1a1440; --panel: #272058; --ink: #f1eeff; --muted: #a9a2d6;
+    --accent: #ff4fa3; --accent-ink: #20082f; --ring: #5a2d6f; --line: #3b3380;
+  }
+  :root[data-skin="forest"] {
+    --bg: #12372a; --panel: #1b4a39; --ink: #eef7e8; --muted: #a5c7b2;
+    --accent: #f2d16b; --accent-ink: #2b2204; --ring: #3d6b50; --line: #2c6049;
+  }
+
+  html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0; min-height: 100%; background: var(--bg); color: var(--ink);
+    font-family: "Nunito", system-ui, sans-serif; line-height: 1.5;
+    transition: background .3s, color .3s;
+  }
+  h1, h2, .big { font-family: "Lilita One", "Arial Rounded MT Bold", system-ui, sans-serif; font-weight: 400; margin: 0; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+  .wrap { max-width: 920px; margin: 0 auto; padding: 20px 16px 40px; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); }
+  .tagline { color: var(--muted); margin: 0; }
+
+  .layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .layout { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 2px solid var(--line); border-radius: 22px; padding: 18px; }
+  .card h2 { font-size: 1.3rem; margin-bottom: 10px; }
+
+  .stats { display: flex; justify-content: space-around; text-align: center; margin-bottom: 14px; }
+  .stats .big { font-size: 2.2rem; display: block; line-height: 1.1; }
+  .stats small { color: var(--muted); font-weight: 700; }
+  .bar { height: 12px; border-radius: 99px; background: var(--ring); overflow: hidden; margin-bottom: 18px; }
+  #bar-fill { height: 100%; width: 100%; background: var(--accent); transform-origin: left; }
+  .stage { display: grid; place-items: center; padding: 8px 0 14px; }
+  #click-btn {
+    width: min(62vw, 250px); aspect-ratio: 1; border-radius: 50%; border: 6px solid var(--ring);
+    background: var(--accent); color: var(--accent-ink); font-family: "Lilita One", system-ui, sans-serif;
+    font-size: clamp(1.4rem, 5vw, 2rem); box-shadow: 0 8px 0 var(--ring); transition: transform .08s, box-shadow .08s;
+    user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  #click-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 var(--ring); }
+  #click-btn:disabled { opacity: .6; cursor: not-allowed; }
+  @media (prefers-reduced-motion: reduce) { #click-btn, body { transition: none; } }
+  #message { text-align: center; min-height: 3.2em; margin: 6px 0 12px; font-weight: 700; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .chip { padding: 8px 16px; border-radius: 99px; border: 2px solid var(--line); background: transparent; font-weight: 800; }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .chip:disabled { opacity: .5; cursor: not-allowed; }
+
+  .side { display: grid; gap: 16px; align-content: start; }
+  .avatars { display: flex; gap: 8px; margin-bottom: 12px; }
+  .avatars button { font-size: 1.6rem; width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--line); background: transparent; }
+  .avatars button[aria-pressed="true"] { border-color: var(--accent); background: var(--ring); }
+  label { font-weight: 800; display: block; margin-bottom: 4px; }
+  input[type="text"] { width: 100%; box-sizing: border-box; padding: 10px 12px; font: inherit; color: var(--ink); background: transparent; border: 2px solid var(--line); border-radius: 12px; margin-bo[...]
+  table { width: 100%; border-collapse: collapse; }
+  td, th { text-align: left; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-size: .9rem; }
+  .total { margin: 12px 0 0; color: var(--muted); }
+  .link { background: none; border: none; color: var(--muted); text-decoration: underline; padding: 0; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Sigma Click Challenge</h1>
+      <p class="tagline">Click as many times as you can before the timer runs out.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <section class="card" aria-label="Game">
+      <div class="stats">
+        <div><span class="big" id="time">10.0</span><small>seconds left</small></div>
+        <div><span class="big" id="count">0</span><small>clicks</small></div>
+        <div><span class="big" id="cps">0.0</span><small>clicks per second</small></div>
+      </div>
+      <div class="bar"><div id="bar-fill"></div></div>
+      <div class="stage"><button id="click-btn">Click to start</button></div>
+      <p id="message" aria-live="polite">Pick a time, then click the big button.</p>
+      <div class="row" id="modes" role="group" aria-label="Time limit">
+        <button class="chip" data-sec="5" aria-pressed="false">5 seconds</button>
+        <button class="chip" data-sec="10" aria-pressed="true">10 seconds</button>
+        <button class="chip" data-sec="30" aria-pressed="false">30 seconds</button>
+      </div>
+    </section>
+
+    <div class="side">
+      <section class="card" aria-label="Profile">
+        <h2>Your profile</h2>
+        <div class="avatars" id="avatars" role="group" aria-label="Avatar"></div>
+        <label for="name">Player name</label>
+        <input type="text" id="name" maxlength="16" placeholder="Type your name">
+        <table>
+          <tr><th>Mode</th><th>Best score</th></tr>
+          <tr><td>5 seconds</td><td id="best-5">-</td></tr>
+          <tr><td>10 seconds</td><td id="best-10">-</td></tr>
+          <tr><td>30 seconds</td><td id="best-30">-</td></tr>
+        </table>
+        <p class="total">Total clicks ever: <strong id="total">0</strong></p>
+        <button class="link" id="reset">Reset my scores</button>
+      </section>
+
+      <section class="card" aria-label="Look">
+        <h2>Pick a look</h2>
+        <div class="row" id="skins" role="group" aria-label="Theme">
+          <button class="chip" data-skin="sunny" aria-pressed="false">Sunny</button>
+          <button class="chip" data-skin="night" aria-pressed="false">Night</button>
+          <button class="chip" data-skin="forest" aria-pressed="false">Forest</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+  const clickBtn = document.getElementById("click-btn");
+  const timeEl = document.getElementById("time");
+  const countEl = document.getElementById("count");
+  const cpsEl = document.getElementById("cps");
+  const barFill = document.getElementById("bar-fill");
+  const message = document.getElementById("message");
+  const nameInput = document.getElementById("name");
+  const totalEl = document.getElementById("total");
+
+  let seconds = 10;
+  let count = 0;
+  let running = false;
+  let startTime = 0;
+  let timerId = null;
+
+  const AVATARS = ["😎", "🦊", "🚀", "🐉"];
+  let profile = { name: "", avatar: "😎", skin: "", total: 0, best: { 5: 0, 10: 0, 30: 0 } };
+
+  function save() {
+    try { localStorage.setItem("sigmaClick", JSON.stringify(profile)); } catch (e) {}
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem("sigmaClick");
+      if (raw) profile = Object.assign(profile, JSON.parse(raw));
+    } catch (e) {}
+  }
+
+  function renderProfile() {
+    nameInput.value = profile.name;
+    totalEl.textContent = profile.total;
+    [5, 10, 30].forEach(function (s) {
+      const b = profile.best[s];
+      document.getElementById("best-" + s).textContent = b ? b + " clicks" : "-";
+    });
+    document.querySelectorAll("#avatars button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.textContent === profile.avatar));
+    });
+    document.querySelectorAll("#skins .chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.skin === profile.skin));
+    });
+    if (profile.skin) document.documentElement.setAttribute("data-skin", profile.skin);
+  }
+
+  function resetDisplay() {
+    count = 0;
+    countEl.textContent = "0";
+    cpsEl.textContent = "0.0";
+    timeEl.textContent = seconds.toFixed(1);
+    barFill.style.transform = "scaleX(1)";
+    clickBtn.textContent = "Click to start";
+  }
+
+  function startRound() {
+    running = true;
+    startTime = Date.now();
+    document.querySelectorAll("#modes .chip").forEach(function (b) { b.disabled = true; });
+    message.textContent = "Go go go!";
+    timerId = setInterval(tick, 100);
+  }
+
+  function tick() {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const left = Math.max(0, seconds - elapsed);
+    timeEl.textContent = left.toFixed(1);
+    barFill.style.transform = "scaleX(" + left / seconds + ")";
+    cpsEl.textContent = (count / Math.max(elapsed, 0.1)).toFixed(1);
+    if (left <= 0) endRound();
+  }
+
+  function rankFor(cps) {
+    if (cps < 3) return "Warming up";
+    if (cps < 5) return "Fast fingers";
+    if (cps < 7) return "Sigma";
+    return "Legend";
+  }
+
+  function endRound() {
+    clearInterval(timerId);
+    running = false;
+    clickBtn.disabled = true;
+    const cps = count / seconds;
+    profile.total += count;
+    let text = "Time is up! " + count + " clicks (" + cps.toFixed(1) + " per second). Rank: " + rankFor(cps) + ".";
+    if (count > profile.best[seconds]) {
+      profile.best[seconds] = count;
+      text += " New best score!";
+    }
+    save();
+    renderProfile();
+    message.textContent = text;
+    clickBtn.textContent = "Wait...";
+    setTimeout(function () {
+      clickBtn.disabled = false;
+      clickBtn.textContent = "Play again";
+      document.querySelectorAll("#modes .chip").forEach(function (b) { b.disabled = false; });
+    }, 800);
+  }
+
+  clickBtn.addEventListener("click", function () {
+    if (!running) {
+      resetDisplay();
+      startRound();
+    }
+    count++;
+    countEl.textContent = count;
+    clickBtn.textContent = "Click!";
+  });
+
+  document.getElementById("modes").addEventListener("click", function (e) {
+    const btn = e.target.closest(".chip");
+    if (!btn || running) return;
+    seconds = Number(btn.dataset.sec);
+    document.querySelectorAll("#modes .chip").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b === btn));
+    });
+    resetDisplay();
+    message.textContent = "Mode: " + seconds + " seconds. Click the big button to start.";
+  });
+
+  AVATARS.forEach(function (emoji) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = emoji;
+    b.setAttribute("aria-label", "Avatar " + emoji);
+    b.addEventListener("click", function () { profile.avatar = emoji; save(); renderProfile(); });
+    document.getElementById("avatars").appendChild(b);
+  });
+
+  nameInput.addEventListener("input", function () {
+    profile.name = nameInput.value;
+    save();
+  });
+
+  document.getElementById("skins").addEventListener("click", function (e) {
+    const btn = e.target.closest(".chip");
+    if (!btn) return;
+    profile.skin = btn.dataset.skin;
+    save();
+    renderProfile();
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    profile.total = 0;
+    profile.best = { 5: 0, 10: 0, 30: 0 };
+    save();
+    renderProfile();
+    message.textContent = "Scores reset. Fresh start!";
+  });
+
+  load();
+  renderProfile();
+  resetDisplay();
+</script>
+</body>
+</html>
