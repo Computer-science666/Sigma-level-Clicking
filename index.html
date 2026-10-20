@@ -1,458 +1,398 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="sunny">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sigma Click Challenge</title>
-    <style>
-        :root {
-            --bg-color: #f0f4f8;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --primary-color: #ff6b35;
-            --primary-hover: #e85a24;
-            --shadow: rgba(0, 0, 0, 0.05);
-        }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sigma Click Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  :root, :root[data-theme="sunny"] {
+    --bg:#e9eef5; --panel:#ffffff; --soft:#f2f6fb; --ink:#10243a; --muted:#5b6f86;
+    --accent:#ff5a1f; --on:#ffffff; --line:#cfd9e6;
+  }
+  :root[data-theme="night"]  { --bg:#14122b; --panel:#1d1a3d; --soft:#252150; --ink:#efeaff; --muted:#a9a2d6; --accent:#ff5fa8; --on:#26082a; --line:#3a3478; }
+  :root[data-theme="forest"] { --bg:#0f2a20; --panel:#173a2d; --soft:#1d4637; --ink:#e8f5e1; --muted:#a3c5b0; --accent:#f0c94a; --on:#2b2204; --line:#2f5b48; }
+  :root[data-theme="neon"]   { --bg:#0a0f1e; --panel:#111a33; --soft:#18244a; --ink:#e6f3ff; --muted:#8fa7c9; --accent:#22e6c7; --on:#032a25; --line:#243562; }
+  :root[data-theme="sakura"] { --bg:#fbe9ee; --panel:#fff8fa; --soft:#fdeff3; --ink:#4a1f33; --muted:#8c5f74; --accent:#e0457b; --on:#ffffff; --line:#f1c9d6; }
 
-        body.sunny {
-            --bg-color: #f0f4f8;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --primary-color: #ff6b35;
-            --primary-hover: #e85a24;
-        }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+    font: 400 1rem/1.5 "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    transition: background .3s, color .3s;
+  }
+  h1, h2, .num { font-family: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif; margin: 0; letter-spacing: -.02em; }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  small { color: var(--muted); }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
-        body.night {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --primary-color: #bb86fc;
-            --primary-hover: #9955eb;
-            --shadow: rgba(0, 0, 0, 0.3);
-        }
+  .app { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  h1 { font-size: clamp(1.7rem, 4.5vw, 2.5rem); font-weight: 800; }
+  .sub { margin: 2px 0 0; color: var(--muted); }
+  .who { display: flex; align-items: center; gap: 8px; padding: 6px 14px 6px 8px; border: 1px solid var(--line); border-radius: 99px; background: var(--panel); font-weight: 600; }
+  .who span:first-child { font-size: 1.4rem; line-height: 1; }
 
-        body.forest {
-            --bg-color: #1b2e23;
-            --card-bg: #273e32;
-            --text-color: #d8f3dc;
-            --primary-color: #52b788;
-            --primary-hover: #40916c;
-            --shadow: rgba(0, 0, 0, 0.2);
-        }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+  .board, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
+  .readout { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .clock .num { display: block; font-size: clamp(3.2rem, 11vw, 5rem); font-weight: 800; line-height: .95; font-variant-numeric: tabular-nums; }
+  .mini { display: flex; gap: 24px; }
+  .mini b { display: block; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 1.9rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px var(--shadow);
-            box-sizing: border-box;
-            transition: background-color 0.3s ease;
-        }
+  .stage { position: relative; width: min(78vw, 330px); aspect-ratio: 1; margin: 22px auto 14px; }
+  .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+  .stage circle { fill: none; stroke-width: 7; }
+  .track { stroke: var(--soft); }
+  .prog { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: 578; stroke-dashoffset: 0; }
+  #click-btn {
+    position: absolute; inset: 7%; border-radius: 50%; border: 0; background: var(--accent); color: var(--on);
+    font: 800 clamp(1.3rem, 5vw, 1.8rem)/1.1 "Bricolage Grotesque", system-ui, sans-serif; letter-spacing: -.01em;
+    box-shadow: 0 10px 0 color-mix(in srgb, var(--accent) 55%, #000); transition: transform .06s, box-shadow .06s;
+    user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  }
+  #click-btn:active:not(:disabled) { transform: translateY(8px); box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 55%, #000); }
+  #click-btn:disabled { opacity: .55; cursor: not-allowed; }
+  .pop { position: absolute; pointer-events: none; font: 800 1.3rem "Bricolage Grotesque", system-ui, sans-serif; color: var(--accent); animation: pop .6s ease-out forwards; }
+  @keyframes pop { to { transform: translateY(-70px); opacity: 0; } }
 
-        h2 {
-            margin-top: 0;
-            font-size: 1.25rem;
-        }
+  #message { text-align: center; min-height: 3em; margin: 6px 0 10px; font-weight: 600; }
+  .actions { display: flex; justify-content: center; }
+  .ghost { padding: 8px 18px; border-radius: 99px; border: 1px solid var(--line); background: transparent; font-weight: 600; }
+  .ghost:disabled { opacity: .45; cursor: not-allowed; }
 
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+  .tabs { display: flex; gap: 4px; padding: 4px; background: var(--soft); border-radius: 12px; margin-bottom: 18px; }
+  .tabs button { flex: 1; padding: 8px; border: 0; border-radius: 9px; background: transparent; font-weight: 600; color: var(--muted); }
+  .tabs button[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+  .group { margin-bottom: 20px; }
+  .group h2 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 7px 14px; border-radius: 99px; border: 1px solid var(--line); background: transparent; font-weight: 600; }
+  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on); }
+  .chip:disabled { opacity: .45; cursor: not-allowed; }
+  .avatars button { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: transparent; font-size: 1.4rem; line-height: 1; }
+  .avatars button[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); box-shadow: 0 0 0 2px var(--accent); }
+  input[type="text"], input[type="number"] { width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--soft); }
+  .custom { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .custom input { width: 90px; }
+  label { font-weight: 600; }
+  .switch { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .switch input { appearance: none; width: 42px; height: 24px; border-radius: 99px; background: var(--line); position: relative; cursor: pointer; transition: background .2s; flex: none; }
+  .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s; }
+  .switch input:checked { background: var(--accent); }
+  .switch input:checked::after { transform: translateX(18px); }
 
-        .stat-box .value {
-            font-size: 1.75rem;
-            font-weight: bold;
-        }
-
-        .stat-box .label {
-            font-size: 0.85rem;
-            opacity: 0.7;
-        }
-
-        .progress-bar-container {
-            height: 8px;
-            background-color: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            margin-bottom: 24px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 100%;
-            background-color: var(--primary-color);
-            transition: width 0.1s linear;
-        }
-
-        .click-area-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .click-btn {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: white;
-            border: 6px solid rgba(255, 255, 255, 0.3);
-            font-size: 1.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.05s ease, background-color 0.2s;
-            user-select: none;
-        }
-
-        .click-btn:active {
-            transform: scale(0.95);
-        }
-
-        .message-box {
-            text-align: center;
-            min-height: 24px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        /* Sleek badge styling to keep rank separate from text */
-        .rank-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-            color: #ffffff;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            margin-top: 8px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .mode-selectors {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid var(--primary-color);
-            background: transparent;
-            color: var(--text-color);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .mode-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .section-card {
-            background-color: rgba(0, 0, 0, 0.02);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .profile-emojis {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .input-group input {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(0,0,0,0.2);
-            background: transparent;
-            color: var(--text-color);
-            font-weight: bold;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 12px;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .reset-btn {
-            background: transparent;
-            border: none;
-            color: var(--primary-color);
-            cursor: pointer;
-            font-weight: bold;
-            padding: 0;
-            text-decoration: underline;
-        }
-
-        .theme-selectors {
-            display: flex;
-            gap: 10px;
-        }
-    </style>
+  table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  th, td { text-align: left; padding: 8px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  th { color: var(--muted); font-weight: 600; font-size: .9rem; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stats div { background: var(--soft); border-radius: 12px; padding: 10px 12px; }
+  .stats b { display: block; font: 700 1.4rem "Bricolage Grotesque", system-ui, sans-serif; }
+  .link { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; }
+  .note { color: var(--muted); font-size: .9rem; margin: 10px 0 0; }
+  ul.hist { list-style: none; margin: 0; padding: 0; }
+  ul.hist li { display: flex; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .pop { animation: none; display: none; } }
+</style>
 </head>
-<body class="sunny">
-
-    <div class="container">
-        <h2>Sigma Click Challenge</h2>
-        <p style="margin-top: 0; opacity: 0.8; font-size: 0.9rem;">Click as many times as you can before the timer runs out.</p>
-
-        <div class="stats-bar">
-            <div class="stat-box">
-                <div class="value" id="timeLeft">30.0</div>
-                <div class="label">seconds left</div>
-            </div>
-            <div class="stat-box">
-                <div class="value" id="clickCount">171</div>
-                <div class="label">clicks</div>
-            </div>
-            <div class="stat-box">
-                <div class="value" id="cps">5.7</div>
-                <div class="label">clicks per second</div>
-            </div>
-        </div>
-
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="progressBar" style="width: 100%;"></div>
-        </div>
-
-        <div class="click-area-container">
-            <button class="click-btn" id="clickBtn">Play again</button>
-        </div>
-
-        <div class="message-box" id="messageBox">
-            Time is up! 171 clicks (5.7 per second).<br>
-            <div class="rank-badge">Rank: Sigma</div><br>
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--primary-color);">🔥 New best score!</span>
-        </div>
-
-        <div class="mode-selectors">
-            <button class="mode-btn" onclick="setMode(5)">5 seconds</button>
-            <button class="mode-btn" onclick="setMode(10)">10 seconds</button>
-            <button class="mode-btn active" onclick="setMode(30)">30 seconds</button>
-        </div>
-
-        <div class="section-card">
-            <h2>Your profile</h2>
-            <div class="profile-emojis">
-                <span>😎</span><span>🦊</span><span>🚀</span><span>🐉</span>
-            </div>
-            <div class="input-group">
-                <label>Player name</label>
-                <input type="text" id="playerName" value="Sigma">
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Mode</th>
-                        <th>Best score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>5 seconds</td>
-                        <td id="best-5">-</td>
-                    </tr>
-                    <tr>
-                        <td>10 seconds</td>
-                        <td id="best-10">-</td>
-                    </tr>
-                    <tr>
-                        <td>30 seconds</td>
-                        <td id="best-30">171</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p style="font-size: 0.9rem; margin-bottom: 12px;">Total clicks ever: <strong id="totalClicks">171</strong></p>
-            <button class="reset-btn" onclick="resetScores()">Reset my scores</button>
-        </div>
-
-        <div class="section-card">
-            <h2>Pick a look</h2>
-            <div class="theme-selectors">
-                <button class="mode-btn active" onclick="setTheme('sunny')">Sunny</button>
-                <button class="mode-btn" onclick="setTheme('night')">Night</button>
-                <button class="mode-btn" onclick="setTheme('forest')">Forest</button>
-            </div>
-        </div>
+<body>
+<main class="app">
+  <header class="top">
+    <div>
+      <h1>Sigma Click Challenge</h1>
+      <p class="sub">Pick a time, then hit the button as fast as you can.</p>
     </div>
+    <div class="who"><span id="who-avatar">😎</span><span id="who-name">Player</span></div>
+  </header>
 
-    <script>
-        let selectedTime = 30;
-        let timeLeft = selectedTime;
-        let clicks = 0;
-        let isPlaying = false;
-        let timer = null;
-        let startTime = null;
-        
-        let scores = {
-            5: null,
-            10: null,
-            30: 171
-        };
-        let totalEver = 171;
+  <div class="grid">
+    <section class="board" aria-label="Game">
+      <div class="readout">
+        <div class="clock"><span class="num" id="time">10.0</span><small>seconds left</small></div>
+        <div class="mini">
+          <div><b id="count">0</b><small>clicks</small></div>
+          <div><b id="cps">0.0</b><small>clicks per second</small></div>
+        </div>
+      </div>
+      <div class="stage" id="stage">
+        <svg viewBox="0 0 200 200" aria-hidden="true"><circle class="track" cx="100" cy="100" r="92"/><circle class="prog" id="ring" cx="100" cy="100" r="92"/></svg>
+        <button id="click-btn" type="button">Click to start</button>
+      </div>
+      <p id="message" aria-live="polite">Click the big button to start the timer.</p>
+      <div class="actions"><button class="ghost" id="share" type="button" disabled>Copy result</button></div>
+    </section>
 
-        const clickBtn = document.getElementById('clickBtn');
-        const timeLeftEl = document.getElementById('timeLeft');
-        const clickCountEl = document.getElementById('clickCount');
-        const cpsEl = document.getElementById('cps');
-        const progressBar = document.getElementById('progressBar');
-        const messageBox = document.getElementById('messageBox');
+    <aside class="panel" aria-label="Options and records">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-options" aria-selected="true" aria-controls="p-options">Options</button>
+        <button role="tab" id="tab-records" aria-selected="false" aria-controls="p-records">Records</button>
+        <button role="tab" id="tab-history" aria-selected="false" aria-controls="p-history">History</button>
+      </div>
 
-        function setMode(seconds) {
-            if (isPlaying) return;
-            selectedTime = seconds;
-            timeLeft = seconds;
-            timeLeftEl.innerText = seconds.toFixed(1);
-            
-            document.querySelectorAll('.mode-selectors .mode-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.innerText.includes(seconds)) btn.classList.add('active');
-            });
-        }
+      <div id="p-options" role="tabpanel" aria-labelledby="tab-options">
+        <div class="group"><h2>Time limit</h2>
+          <div class="row" id="modes"></div>
+          <div class="custom"><label for="custom">Custom (3 to 120 s)</label><input type="number" id="custom" min="3" max="120" inputmode="numeric" placeholder="25"></div>
+        </div>
+        <div class="group"><h2>Theme</h2><div class="row" id="themes"></div></div>
+        <div class="group"><h2>Avatar</h2><div class="row avatars" id="avatars"></div></div>
+        <div class="group"><label for="name">Player name</label><input type="text" id="name" maxlength="16" placeholder="Type your name" autocomplete="off"></div>
+        <div class="group">
+          <div class="switch"><label for="sound">Sound effects</label><input type="checkbox" id="sound"></div>
+          <div class="switch"><label for="fx">Floating +1 pop-ups</label><input type="checkbox" id="fx"></div>
+          <div class="switch"><label for="space">Space bar clicks</label><input type="checkbox" id="space"></div>
+        </div>
+      </div>
 
-        function setTheme(theme) {
-            document.body.className = theme;
-            document.querySelectorAll('.theme-selectors .mode-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.innerText.toLowerCase() === theme) btn.classList.add('active');
-            });
-        }
+      <div id="p-records" role="tabpanel" aria-labelledby="tab-records" hidden>
+        <div class="stats">
+          <div><b id="total">0</b><small>total clicks</small></div>
+          <div><b id="rounds">0</b><small>rounds played</small></div>
+          <div><b id="bestcps">0.0</b><small>best per second</small></div>
+        </div>
+        <table><thead><tr><th>Mode</th><th>Best score</th></tr></thead><tbody id="best-rows"></tbody></table>
+        <button class="link" id="reset" type="button">Reset my scores</button>
+        <p class="note">Scores are saved in this browser only.</p>
+      </div>
 
-        clickBtn.addEventListener('click', () => {
-            if (!isPlaying && timeLeft <= 0) {
-                resetGame();
-            }
+      <div id="p-history" role="tabpanel" aria-labelledby="tab-history" hidden>
+        <ul class="hist" id="hist"></ul>
+        <p class="note" id="hist-empty">Your last 8 rounds appear here.</p>
+      </div>
+    </aside>
+  </div>
+</main>
 
-            if (!isPlaying) {
-                startGame();
-            }
+<script>
+  const $ = (id) => document.getElementById(id);
+  const clickBtn = $("click-btn"), timeEl = $("time"), countEl = $("count"), cpsEl = $("cps");
+  const ring = $("ring"), message = $("message"), shareBtn = $("share"), stage = $("stage");
+  const RING = 578;
 
-            clicks++;
-            clickCountEl.innerText = clicks;
-            
-            let elapsed = (Date.now() - startTime) / 1000;
-            if (elapsed > 0) {
-                cpsEl.innerText = (clicks / elapsed).toFixed(1);
-            }
-        });
+  const MODES = [5, 10, 30, 60];
+  const THEMES = { sunny: "Sunny", night: "Night", forest: "Forest", neon: "Neon", sakura: "Sakura" };
+  const AVATARS = ["😎", "🦊", "🚀", "🐉", "🐼", "⚡", "👑", "🎯"];
+  let profile = { name: "", avatar: "😎", theme: "sunny", sound: true, fx: true, space: true,
+                  seconds: 10, total: 0, rounds: 0, bestCps: 0, best: {}, history: [] };
 
-        function startGame() {
-            isPlaying = true;
-            clicks = 0;
-            clickCountEl.innerText = 0;
-            cpsEl.innerText = '0.0';
-            clickBtn.innerText = 'Click!';
-            messageBox.innerText = 'Click as fast as you can!';
-            
-            startTime = Date.now();
-            let duration = selectedTime * 1000;
+  function save() { try { localStorage.setItem("sigmaClickV2", JSON.stringify(profile)); } catch (e) {} }
+  function load() {
+    try { const raw = localStorage.getItem("sigmaClickV2"); if (raw) Object.assign(profile, JSON.parse(raw)); } catch (e) {}
+  }
 
-            timer = setInterval(() => {
-                let currentElapsed = Date.now() - startTime;
-                let remaining = Math.max(0, (duration - currentElapsed) / 1000);
-                
-                timeLeft = remaining;
-                timeLeftEl.innerText = remaining.toFixed(1);
-                progressBar.style.width = `${(remaining / selectedTime) * 100}%`;
+  let count = 0, running = false, startTime = 0, timerId = null, lastResult = "";
 
-                if (remaining <= 0) {
-                    endGame();
-                }
-            }, 50);
-        }
+  let audio = null;
+  function beep(freq, len) {
+    if (!profile.sound) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = freq; g.gain.value = 0.04;
+      o.connect(g); g.connect(audio.destination);
+      o.start(); o.stop(audio.currentTime + len);
+    } catch (e) {}
+  }
 
-        function endGame() {
-            clearInterval(timer);
-            isPlaying = false;
-            clickBtn.innerText = 'Play again';
-            
-            let finalCps = selectedTime > 0 ? (clicks / selectedTime).toFixed(1) : 0;
-            cpsEl.innerText = finalCps;
-            
-            let rank = "Novice";
-            if (clicks > 150) rank = "Sigma";
-            else if (clicks > 100) rank = "Chad";
-            else if (clicks > 50) rank = "Pro";
+  function rankFor(cps) {
+    if (cps < 3) return "Warming up";
+    if (cps < 5) return "Fast fingers";
+    if (cps < 7) return "Sigma";
+    if (cps < 10) return "Legend";
+    return "Mythic";
+  }
 
-            // Clean layout with the rank in its own standalone badge element
-            messageBox.innerHTML = `Time is up! ${clicks} clicks (${finalCps} per second).<br><div class="rank-badge">Rank: ${rank}</div>`;
+  function allModes() {
+    const set = new Set(MODES);
+    Object.keys(profile.best).forEach(function (k) { set.add(Number(k)); });
+    return Array.from(set).sort(function (a, b) { return a - b; });
+  }
 
-            let isNewBest = false;
-            if (scores[selectedTime] === null || clicks > scores[selectedTime]) {
-                scores[selectedTime] = clicks;
-                document.getElementById(`best-${selectedTime}`).innerText = clicks;
-                isNewBest = true;
-                messageBox.innerHTML += `<br><span style="font-size: 0.8rem; font-weight: bold; color: var(--primary-color); display: inline-block; margin-top: 6px;">🔥 New best score!</span>`;
-            }
+  function renderStatic() {
+    document.documentElement.dataset.theme = profile.theme;
+    $("who-avatar").textContent = profile.avatar;
+    $("who-name").textContent = profile.name || "Player";
+    $("sound").checked = profile.sound; $("fx").checked = profile.fx; $("space").checked = profile.space;
+    document.querySelectorAll("#modes .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(Number(b.dataset.sec) === profile.seconds)); });
+    document.querySelectorAll("#themes .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.theme === profile.theme)); });
+    document.querySelectorAll("#avatars button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.textContent === profile.avatar)); });
+    $("custom").value = MODES.indexOf(profile.seconds) === -1 ? profile.seconds : "";
+  }
 
-            totalEver += clicks;
-            document.getElementById('totalClicks').innerText = totalEver;
-            progressBar.style.width = '100%';
-        }
+  function renderRecords() {
+    $("total").textContent = profile.total;
+    $("rounds").textContent = profile.rounds;
+    $("bestcps").textContent = profile.bestCps.toFixed(1);
+    const body = $("best-rows"); body.textContent = "";
+    allModes().forEach(function (s) {
+      const tr = document.createElement("tr"), a = document.createElement("td"), b = document.createElement("td");
+      a.textContent = s + " seconds"; b.textContent = profile.best[s] ? profile.best[s] + " clicks" : "-";
+      tr.append(a, b); body.appendChild(tr);
+    });
+    const list = $("hist"); list.textContent = "";
+    profile.history.forEach(function (h) {
+      const li = document.createElement("li"), l = document.createElement("span"), r = document.createElement("span");
+      l.textContent = h.s + "s: " + h.c + " clicks (" + h.cps.toFixed(1) + "/s)"; r.textContent = h.rank;
+      li.append(l, r); list.appendChild(li);
+    });
+    $("hist-empty").hidden = profile.history.length > 0;
+  }
 
-        function resetGame() {
-            timeLeft = selectedTime;
-            timeLeftEl.innerText = selectedTime.toFixed(1);
-            clicks = 0;
-            clickCountEl.innerText = 0;
-            cpsEl.innerText = '0.0';
-            progressBar.style.width = '100%';
-            messageBox.innerText = 'Press the button to start!';
-            clickBtn.innerText = 'Play';
-        }
+  function resetDisplay() {
+    count = 0;
+    countEl.textContent = "0"; cpsEl.textContent = "0.0";
+    timeEl.textContent = profile.seconds.toFixed(1);
+    ring.style.strokeDashoffset = "0";
+    clickBtn.textContent = "Click to start";
+  }
 
-        function resetScores() {
-            scores = { 5: null, 10: null, 30: null };
-            totalEver = 0;
-            document.getElementById('best-5').innerText = '-';
-            document.getElementById('best-10').innerText = '-';
-            document.getElementById('best-30').innerText = '-';
-            document.getElementById('totalClicks').innerText = '0';
-        }
-    </script>
+  function startRound() {
+    running = true; startTime = Date.now();
+    shareBtn.disabled = true;
+    setControlsLocked(true);
+    message.textContent = "Go go go!";
+    timerId = setInterval(tick, 50);
+  }
+
+  function tick() {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const left = Math.max(0, profile.seconds - elapsed);
+    timeEl.textContent = left.toFixed(1);
+    ring.style.strokeDashoffset = String(RING * (1 - left / profile.seconds));
+    cpsEl.textContent = (count / Math.max(elapsed, 0.1)).toFixed(1);
+    if (left <= 0) endRound();
+  }
+
+  function endRound() {
+    clearInterval(timerId); running = false;
+    clickBtn.disabled = true;
+    const s = profile.seconds, cps = count / s, rank = rankFor(cps);
+    profile.total += count; profile.rounds += 1;
+    if (cps > profile.bestCps) profile.bestCps = cps;
+    let text = "Time is up! " + count + " clicks, " + cps.toFixed(1) + " per second. Rank: " + rank + ".";
+    if (count > (profile.best[s] || 0)) { profile.best[s] = count; text += " New best score!"; }
+    profile.history.unshift({ s: s, c: count, cps: cps, rank: rank });
+    profile.history = profile.history.slice(0, 8);
+    lastResult = "I got " + count + " clicks in " + s + " seconds (" + cps.toFixed(1) + " per second). Rank: " + rank + " on Sigma Click Challenge!";
+    cpsEl.textContent = cps.toFixed(1); timeEl.textContent = "0.0";
+    ring.style.strokeDashoffset = String(RING);
+    message.textContent = text;
+    clickBtn.textContent = "Wait...";
+    beep(660, 0.25);
+    save(); renderRecords();
+    setTimeout(function () {
+      clickBtn.disabled = false; clickBtn.textContent = "Play again";
+      shareBtn.disabled = false; setControlsLocked(false);
+    }, 800);
+  }
+
+  function handleClick() {
+    if (clickBtn.disabled) return;
+    if (!running) { resetDisplay(); startRound(); }
+    count++;
+    countEl.textContent = count;
+    clickBtn.textContent = "Click!";
+    beep(300 + Math.min(count, 60) * 8, 0.04);
+    if (profile.fx) popAt();
+  }
+
+  function popAt() {
+    const p = document.createElement("span");
+    p.className = "pop"; p.textContent = "+1";
+    p.style.left = (35 + Math.random() * 30) + "%"; p.style.top = (20 + Math.random() * 20) + "%";
+    p.addEventListener("animationend", function () { p.remove(); });
+    stage.appendChild(p);
+  }
+
+  function setControlsLocked(lock) {
+    document.querySelectorAll("#modes .chip, #custom").forEach(function (el) { el.disabled = lock; });
+  }
+
+  clickBtn.addEventListener("click", handleClick);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.code !== "Space" || !profile.space) return;
+    if (e.target !== document.body && e.target !== clickBtn) return;
+    e.preventDefault();
+    if (!e.repeat) handleClick();
+  });
+  document.addEventListener("keyup", function (e) {
+    if (e.code === "Space" && profile.space && (e.target === document.body || e.target === clickBtn)) e.preventDefault();
+  });
+
+  function setSeconds(n) {
+    if (running) return;
+    profile.seconds = Math.min(120, Math.max(3, Math.round(n) || 10));
+    save(); renderStatic(); resetDisplay();
+    message.textContent = "Mode: " + profile.seconds + " seconds. Click the big button to start.";
+    shareBtn.disabled = true;
+  }
+
+  MODES.forEach(function (s) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.dataset.sec = s; b.textContent = s + " seconds";
+    b.addEventListener("click", function () { setSeconds(s); });
+    $("modes").appendChild(b);
+  });
+  $("custom").addEventListener("change", function () { if ($("custom").value) setSeconds(Number($("custom").value)); });
+
+  Object.keys(THEMES).forEach(function (t) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.dataset.theme = t; b.textContent = THEMES[t];
+    b.addEventListener("click", function () { profile.theme = t; save(); renderStatic(); });
+    $("themes").appendChild(b);
+  });
+
+  AVATARS.forEach(function (emoji) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = emoji; b.setAttribute("aria-label", "Avatar " + emoji);
+    b.addEventListener("click", function () { profile.avatar = emoji; save(); renderStatic(); });
+    $("avatars").appendChild(b);
+  });
+
+  $("name").addEventListener("input", function () {
+    profile.name = $("name").value; $("who-name").textContent = profile.name || "Player"; save();
+  });
+  ["sound", "fx", "space"].forEach(function (k) {
+    $(k).addEventListener("change", function () { profile[k] = $(k).checked; save(); });
+  });
+
+  const TABS = ["options", "records", "history"];
+  TABS.forEach(function (name) {
+    $("tab-" + name).addEventListener("click", function () {
+      TABS.forEach(function (n) {
+        $("tab-" + n).setAttribute("aria-selected", String(n === name));
+        $("p-" + n).hidden = n !== name;
+      });
+    });
+  });
+
+  shareBtn.addEventListener("click", function () {
+    if (!lastResult) return;
+    const done = function (t) { shareBtn.textContent = t; setTimeout(function () { shareBtn.textContent = "Copy result"; }, 1800); };
+    try { navigator.clipboard.writeText(lastResult).then(function () { done("Copied!"); }, function () { done("Copy failed"); }); }
+    catch (e) { done("Copy failed"); }
+  });
+
+  let resetArmed = false;
+  $("reset").addEventListener("click", function () {
+    if (!resetArmed) {
+      resetArmed = true; $("reset").textContent = "Click again to confirm";
+      setTimeout(function () { resetArmed = false; $("reset").textContent = "Reset my scores"; }, 3000);
+      return;
+    }
+    profile.total = 0; profile.rounds = 0; profile.bestCps = 0; profile.best = {}; profile.history = [];
+    resetArmed = false; $("reset").textContent = "Reset my scores";
+    save(); renderRecords(); message.textContent = "Scores reset. Fresh start!";
+  });
+
+  load();
+  $("name").value = profile.name;
+  renderStatic(); renderRecords(); resetDisplay();
+</script>
 </body>
 </html>
